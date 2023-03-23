@@ -1,4 +1,9 @@
 defmodule Kvasir.Logger do
+  @moduledoc """
+  Logger backend for Kvasir to send the log messages to a syslog server.
+  This backend is creating an UDP client to send the syslog messages as
+  a client.
+  """
   alias :gen_event, as: GenEvent
   alias Kvasir.Syslog
   alias Kvasir.Syslog.Client
@@ -6,9 +11,17 @@ defmodule Kvasir.Logger do
   @behaviour :gen_event
 
   @impl GenEvent
+  @doc false
   def init(__MODULE__) do
     opts = Application.get_env(:logger, __MODULE__)
     {:ok, configure(opts)}
+  end
+
+  @impl GenEvent
+  @doc false
+  def terminate(_reason_or_args, state) do
+    Client.stop(state.socket)
+    :ok
   end
 
   defp get_ip(address) when is_binary(address) do

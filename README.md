@@ -1,21 +1,20 @@
 # Kvasir
+Elixir Syslog server, client, and backend for Logger.
 
-**TODO: Add description**
+Kvasir's goal is to keep everything we could need regarding Syslog. If we need a client,
+a server, or provide a backend for Logger.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `kvasir` to your list of dependencies in `mix.exs`:
+At the moment there's no hex package available, so you can install it using:
 
 ```elixir
 def deps do
   [
-    {:kvasir, "~> 0.1.0"}
+    {:kvasir, github: "altenwald/kvasir"}
   ]
 end
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/kvasir>.
-
+using the command `mix docs`.

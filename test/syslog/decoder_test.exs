@@ -14,9 +14,7 @@ defmodule Syslog.DecoderTest do
     syslog_msg =
       "<165>1 2003-08-24T12:14:15.000003Z 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts."
 
-    {:ok, socket} = :gen_udp.open(0)
-    :gen_udp.send(socket, {127, 0, 0, 1}, port, syslog_msg)
-    :gen_udp.close(socket)
+    send_msg(port, syslog_msg)
 
     syslog = %Kvasir.Syslog{
       app_name: "myproc",
@@ -29,5 +27,19 @@ defmodule Syslog.DecoderTest do
     }
 
     assert_receive [^syslog]
+  end
+
+  test "producing an incorrect event", %{port: port} do
+    syslog_msg = "<0>1 2023-01-01T00:00:00Z localhost kvasir 0.123.0"
+
+    send_msg(port, syslog_msg)
+
+    refute_receive _
+  end
+
+  defp send_msg(port, syslog_msg) do
+    {:ok, socket} = :gen_udp.open(0)
+    :gen_udp.send(socket, {127, 0, 0, 1}, port, syslog_msg)
+    :gen_udp.close(socket)
   end
 end

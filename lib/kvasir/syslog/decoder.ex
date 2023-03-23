@@ -1,4 +1,8 @@
 defmodule Kvasir.Syslog.Decoder do
+  @moduledoc """
+  The decoder is a consumer from the server, it's getting each string from
+  the server and providing its decoded form as a producer.
+  """
   use GenStage, restart: :transient
   require Logger
   alias Kvasir.Syslog.Parser
@@ -21,7 +25,7 @@ defmodule Kvasir.Syslog.Decoder do
     |> Enum.map(fn event ->
       case Parser.parse(event) do
         {:error, reason} ->
-          Logger.error("dropping message: #{reason}")
+          Logger.error("dropping message: #{inspect(reason)}")
           nil
 
         syslog ->

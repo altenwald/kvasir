@@ -1,8 +1,15 @@
 defmodule Kvasir.Syslog.Encode do
+  @moduledoc """
+  Encode a syslog structure (see `Kvasir.Syslog`) as string.
+  It uses the `String.Chars` protocol to implement `to_string/1`
+  function and let us convert the structure into a string.
+  """
   alias Kvasir.Syslog
   require Logger
 
   defimpl String.Chars, for: Syslog do
+    @moduledoc false
+
     defp get_prival(syslog) do
       if prival = Syslog.get_prival(syslog), do: "<#{prival}>", else: ""
     end
@@ -87,7 +94,7 @@ defmodule Kvasir.Syslog.Encode do
 
     defp params(params) do
       Enum.map_join(params, " ", fn {key, value} ->
-        "#{key}=\"#{escape(value)}\""
+        "#{key}=\"#{escape(Kernel.to_string(value))}\""
       end)
     end
 

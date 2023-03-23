@@ -1,4 +1,9 @@
 defmodule Kvasir.Syslog.Client do
+  @moduledoc """
+  Creates a syslog client. It requires a port from where we are going
+  to send the message to the syslog server. It could be useful to create
+  a pool of clients to send the syslog messages.
+  """
   use GenServer, restart: :transient
   require Logger
   alias Kvasir.Syslog
