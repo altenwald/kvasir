@@ -5,6 +5,9 @@ defmodule Kvasir.Syslog.ParserTest do
 
   describe "rfc3164 examples" do
     test "5.4. example 1" do
+      current_year = Date.utc_today().year
+      timestamp = %{~U"2024-10-11 22:14:15Z" | year: current_year}
+
       assert %Syslog{
                app_name: "su",
                facility: :auth,
@@ -12,7 +15,7 @@ defmodule Kvasir.Syslog.ParserTest do
                message: "'su root' failed for lonvick on /dev/pts/8",
                rfc: :rfc3164,
                severity: :critical,
-               timestamp: ~U[2023-10-11 22:14:15Z]
+               timestamp: timestamp
              } ==
                Parser.parse(
                  "<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick" <>
@@ -39,7 +42,7 @@ defmodule Kvasir.Syslog.ParserTest do
                process_id: "10",
                rfc: :rfc3164,
                severity: :notice,
-               timestamp: ~U[1987-08-24 05:34:00Z]
+               timestamp: ~U[1987-08-24 03:34:00Z]
              } ==
                Parser.parse(
                  "<165>Aug 24 05:34:00 CST 1987 mymachine myproc[10]: %% It's " <>

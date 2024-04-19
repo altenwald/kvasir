@@ -11,6 +11,11 @@ defmodule Kvasir.Syslog.Parser do
 
   defguardp rfc3164?(text) when text in ["PRI invalid", "VERSION invalid"]
 
+  @doc """
+  Parse the text message as a Syslog struct or returns a parser error.
+  The function tries to parse first for RFC5424 and if that's failing
+  then it's trying to parse RFC3164.
+  """
   def parse(message) do
     case parse_rfc5424(message) do
       %Syslog{} = syslog ->
@@ -24,6 +29,10 @@ defmodule Kvasir.Syslog.Parser do
     end
   end
 
+  @doc """
+  Parse the text message based on the RFC5424 and if that's failing it's
+  returning an error.
+  """
   def parse_rfc5424(message) do
     {message, Syslog.new()}
     |> parse_prival()
@@ -41,6 +50,10 @@ defmodule Kvasir.Syslog.Parser do
     end)
   end
 
+  @doc """
+  Parse the text message based on the RFC3164 and if that's failing it's
+  returning an error.
+  """
   def parse_rfc3164(message) do
     {message, Syslog.new(:rfc3164)}
     |> parse_prival()
@@ -143,17 +156,22 @@ defmodule Kvasir.Syslog.Parser do
   defp to_datetime(datetime_str, tz) do
     datetime_str
     |> NaiveDateTime.from_iso8601!()
-    |> DateTime.from_naive(tz, Tzdata.TimeZoneDatabase)
+    |> DateTime.from_naive(to_timezone(tz), Tzdata.TimeZoneDatabase)
     |> case do
       {:ok, datetime} ->
         DateTime.shift_zone!(datetime, @default_timezone)
 
       {:error, :time_zone_not_found} ->
-        # FIXME for timezones BST, CST, among others
         Logger.error("timezone (#{tz}) not found using #{@default_timezone}")
         to_datetime(datetime_str, @default_timezone)
     end
   end
+
+  #  TODO add more timezones that are not included in tzdata
+  defp to_timezone("BST"), do: "Europe/London"
+  defp to_timezone("CST"), do: "Europe/Brussels"
+  defp to_timezone("CET"), do: "Europe/Brussels"
+  defp to_timezone(tz), do: tz
 
   defp get_year("", "", year), do: year
   defp get_year("", year, _), do: year

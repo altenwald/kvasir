@@ -50,7 +50,7 @@ defmodule Kvasir.LoggerTest do
   end
 
   test "log warn" do
-    Logger.warn("hello world!")
+    Logger.warning("hello world!")
     assert_receive {:udp, _, _, _, message}, 500
 
     message = to_string(message)

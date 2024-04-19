@@ -3,6 +3,11 @@ defmodule Kvasir.Syslog do
   Syslog structure for storing the message.
   """
 
+  @typedoc """
+  The facility is one of the filters syslog uses to know how to filter
+  the logs received in a fast and easy way. The facility is regarding
+  the kind of service that is generating the log, i.e. user, mail, or ftp.
+  """
   @type facility() ::
           :kernel
           | :user_level
@@ -30,6 +35,11 @@ defmodule Kvasir.Syslog do
           | :local6
           | :local7
 
+  @typedoc """
+  Severity is the level of importance for the log and another kind of filter
+  we could apply to the logs. We could indicate emergency, critical, warning,
+  or debug.
+  """
   @type severity() ::
           :emergency
           | :alert
@@ -41,6 +51,28 @@ defmodule Kvasir.Syslog do
           | :info
           | :debug
 
+  @typedoc """
+  The information about the log generated you can check `Kvasir.Syslog.Encode`
+  and `Kvasir.Syslog.Decoder` to know how it's encoded and decoded from the
+  string format.
+
+  The fields included are:
+
+  - `rfc` indicating the kind of RFC the log is following, we have mainly two
+    RFC to choose: RFC3164 and RFC5424.
+  - `facility` you can see the `facility/0` type.
+  - `severity` you can see the `severity/0` type.
+  - `version` is the version and it should be a number greater than 0.
+  - `hostname` is the hostname where the log is generated.
+  - `ip_address` is the IP address, it could be IPv4 or IPv6.
+  - `app_name` is the name of the application that generated the log.
+  - `process_id` is the PID of the OS process that generated the log.
+  - `message_id` is the ID for the message generated.
+  - `timestamp` is the date and time about when the log was generated.
+  - `structured_data` is a set of structured data shared instead or in addition
+    to the message.
+  - `message` the log message generated.
+  """
   @type t() :: %__MODULE__{
           rfc: :rfc3164 | :rfc5424,
           facility: nil | facility(),
@@ -69,8 +101,15 @@ defmodule Kvasir.Syslog do
             structured_data: %{},
             message: nil
 
+  @doc """
+  Create a new Syslog struct.
+  """
   def new(rfc \\ :rfc5424), do: %__MODULE__{rfc: rfc}
 
+  @doc """
+  Set the facility for the giving Syslog structure. You can use both,
+  numbers between 0 and 23 or an valid atom (see `facility/0`).
+  """
   @spec set_facility(t(), 0..23 | facility()) :: t()
   def set_facility(%__MODULE__{} = syslog, 0), do: %__MODULE__{syslog | facility: :kernel}
   def set_facility(%__MODULE__{} = syslog, :kernel), do: %__MODULE__{syslog | facility: :kernel}
@@ -131,6 +170,9 @@ defmodule Kvasir.Syslog do
   def set_facility(%__MODULE__{} = syslog, 23), do: %__MODULE__{syslog | facility: :local7}
   def set_facility(%__MODULE__{} = syslog, :local7), do: %__MODULE__{syslog | facility: :local7}
 
+  @doc """
+  Get the number of the facility given the atom (see `facility/0`).
+  """
   def get_facility(:kernel), do: 0
   def get_facility(:user_level), do: 1
   def get_facility(:mail), do: 2
@@ -156,6 +198,10 @@ defmodule Kvasir.Syslog do
   def get_facility(:local6), do: 22
   def get_facility(:local7), do: 23
 
+  @doc """
+  Set the severity for the given Syslog struct. You can use both
+  a number between 0 and 7 or an atom (see `severity/0`).
+  """
   @spec set_severity(t(), 0..7 | severity()) :: t()
   def set_severity(%__MODULE__{} = syslog, 0), do: %__MODULE__{syslog | severity: :emergency}
 
@@ -190,6 +236,10 @@ defmodule Kvasir.Syslog do
   def get_severity(:info), do: 6
   def get_severity(:debug), do: 7
 
+  @doc """
+  Get the PRIVAL, the value we can see in the log messages as a number.
+  It's the combination between the facility and severity.
+  """
   def get_prival(%__MODULE__{facility: nil, severity: nil}), do: nil
 
   def get_prival(%__MODULE__{facility: facility, severity: severity}) do
@@ -207,6 +257,10 @@ defmodule Kvasir.Syslog do
     end
   end)
 
+  @doc """
+  Add structured data for a given Syslog struct. It's indeed setting the new
+  value inside of the structured data and if that value exists it's replaced.
+  """
   def add_structured_data(%__MODULE__{structured_data: structured_data} = syslog, name, value) do
     %__MODULE__{syslog | structured_data: Map.put(structured_data, name, value)}
   end

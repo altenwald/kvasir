@@ -4,14 +4,34 @@ defmodule Kvasir.MixProject do
   def project do
     [
       app: :kvasir,
-      version: "0.1.0",
-      elixir: "~> 1.14",
+      description: "Elixir Syslog server, client, and backend for Logger.",
+      version: "1.0.0",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      docs: docs(),
+      package: package(),
       preferred_cli_env: [
         check: :test
       ]
+    ]
+  end
+
+  defp package do
+    [
+      name: :kvasir_syslog,
+      files: ["lib", "mix.exs", "mix.lock", "README*", "COPYING*"],
+      maintainers: ["Manuel Rubio"],
+      licenses: ["LGPL-2.1-only"],
+      links: %{"GitHub" => "https://github.com/altenwald/kvasir"}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"]
     ]
   end
 

@@ -6,9 +6,11 @@ defmodule Syslog.ServerTest do
     {:ok, server} = Kvasir.Application.start_server(port: 0)
     {:ok, consumer} = Kvasir.Consumer.start_link(server)
     {:ok, port} = Server.get_port(server)
+
     on_exit(fn ->
       :ok = Server.stop(server)
     end)
+
     %{server: server, consumer: consumer, port: port}
   end
 
