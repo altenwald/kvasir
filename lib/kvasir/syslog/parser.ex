@@ -2,7 +2,6 @@ defmodule Kvasir.Syslog.Parser do
   @moduledoc """
   Parse the syslog message and encode it as a syslog structure.
   """
-
   import Bitwise
   require Logger
   alias Kvasir.Syslog
@@ -214,7 +213,7 @@ defmodule Kvasir.Syslog.Parser do
 
   defp parse_string({message, syslog}, f, name, size) do
     case String.split(message, " ", parts: 2) do
-      [value, rest_message] when byte_size(value) in 1..size ->
+      [value, rest_message] when byte_size(value) in 1..size//1 ->
         {rest_message, f.(syslog, value)}
 
       _ ->
